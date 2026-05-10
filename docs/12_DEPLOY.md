@@ -110,7 +110,7 @@ All database calls throughout the application are fully async (`await`). The dri
 
 ### Region selection
 
-`vercel.json` is set to `syd1` (Sydney) to minimise latency to ASX data. Change to your preferred region:
+`vercel.json` is set to `syd1` (Sydney) to minimise latency to ASX data. Note: `vercel.json` no longer contains a `crons` block — hourly alert checks are handled by GitHub Actions (`check-alerts.yml`) because Vercel Hobby (free tier) limits crons to daily. See [`docs/13_ALERTS.md`](./13_ALERTS.md) for the Vercel Pro migration path. Change to your preferred region:
 
 | Region | Code | Best for |
 |---|---|---|

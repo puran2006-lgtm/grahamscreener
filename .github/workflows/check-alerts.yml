@@ -1,0 +1,48 @@
+name: Hourly Alert Check
+
+on:
+  schedule:
+    - cron: "0 */1 * * *" # Every hour
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: Evaluate price alerts
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Call check-alerts endpoint
+        id: curl
+        continue-on-error: true
+        run: |
+          curl -X GET https://grahamscreener.com/api/cron/check-alerts \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            --fail-with-body \
+            -o response.json -w "\nHTTP_CODE:%{http_code}\n"
+          cat response.json
+
+      - name: Write failure log
+        if: steps.curl.outcome == 'failure'
+        run: |
+          echo "Alert check failed." > failure.md
+          echo "" >> failure.md
+          echo "**Workflow:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> failure.md
+          echo "**Date:** $(date -u '+%Y-%m-%d %H:%M UTC')" >> failure.md
+          echo "" >> failure.md
+          echo "**Response:**" >> failure.md
+          echo '```' >> failure.md
+          cat response.json 2>/dev/null || echo "(no response body)"
+          echo '```' >> failure.md
+
+      - name: Open failure issue
+        if: steps.curl.outcome == 'failure'
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "[Auto] Alert check failed $(date -u '+%Y-%m-%d')"
+          content-filepath: failure.md
+          labels: automation-failure
+
+      - name: Fail workflow
+        if: steps.curl.outcome == 'failure'
+        run: exit 1

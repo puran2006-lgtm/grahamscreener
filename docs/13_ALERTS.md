@@ -2,7 +2,7 @@
 
 ## Overview
 
-GrahamScreener sends email alerts when a stock hits a price condition you define. Alerts are evaluated hourly by a Vercel Cron job and delivered via [Resend](https://resend.com).
+GrahamScreener sends email alerts when a stock hits a price condition you define. Alerts are evaluated hourly by a GitHub Actions workflow and delivered via [Resend](https://resend.com).
 
 ## Condition Types
 
@@ -18,16 +18,27 @@ For percentage-based alerts, you set a **reference price** at creation time. The
 ## How It Works
 
 1. **You create an alert** via the `/alerts` page — specify ticker, condition, threshold, and your email.
-2. **Vercel Cron runs hourly** (`0 */1 * * *`) — calls `GET /api/cron/check-alerts` with a `Bearer CRON_SECRET` header.
+2. **GitHub Actions runs hourly** (`0 */1 * * *`) — calls `GET /api/cron/check-alerts` on the live site with a `Bearer CRON_SECRET` header.
 3. **The endpoint evaluates each active alert** against the current price (fetched from Yahoo, with snapshot cache fallback).
 4. **If triggered**, an email is sent via Resend and `last_fired_at` is updated.
 5. **24h debounce** — once an alert fires, it won't fire again for 24 hours. This prevents spam during sustained price moves (e.g., a stock hovering around your stop loss for several days).
 
 ## Cron Frequency
 
-Alerts are checked **once per hour**. This balances timeliness with Yahoo rate-limit constraints. The cron job processes alerts sequentially with 500ms pauses between tickers to avoid 429 responses.
+Alerts are checked **once per hour** via GitHub Actions (`check-alerts.yml`). This balances timeliness with Yahoo rate-limit constraints. The endpoint processes alerts sequentially with 500ms pauses between tickers to avoid 429 responses.
 
-For the Vercel free tier, cron jobs run once per day. On Pro ($20/mo), they run on schedule (hourly). See [Vercel Cron Jobs docs](https://vercel.com/docs/cron-jobs).
+GitHub Actions has no cron frequency limits on public repos, so hourly execution works on any plan.
+
+### Migrating to Vercel Pro
+
+If you upgrade to Vercel Pro ($20/mo), you can use Vercel's native cron instead of GitHub Actions:
+
+1. Add the cron block back to `vercel.json`:
+   ```json
+   "crons": [{ "path": "/api/cron/check-alerts", "schedule": "0 */1 * * *" }]
+   ```
+2. Disable the GitHub Actions workflow: Actions tab → "Hourly Alert Check" → "..." → "Disable workflow"
+3. Deploy — Vercel Pro runs the cron natively with lower latency
 
 ## Resend Email Provider
 

@@ -40,7 +40,19 @@ Runs lint → type-check → build to catch issues before they reach the deploy 
 
 **Schedule (AEST):** No fixed schedule — fires on every PR and non-main push.
 
-### 5. Dependabot (`dependabot.yml`)
+### 5. Hourly Alert Check (`check-alerts.yml`)
+
+**Triggers:** Cron schedule (hourly), manual dispatch.
+
+Calls the live `GET /api/cron/check-alerts` endpoint with `CRON_SECRET` auth. The endpoint evaluates all active price alerts against current prices and sends email via Resend when triggered. This was migrated from Vercel Cron because Vercel Hobby (free tier) limits crons to daily — GitHub Actions has no frequency limits on public repos.
+
+**Schedule (AEST):** Every hour, on the hour.
+
+**Failure handling:** Opens a GitHub Issue with the response body if the curl fails (HTTP error). Yahoo 429s are handled inside the API (returns 200 with `failed` count), so rate-limit issues don't trigger false workflow failures.
+
+**Required secret:** `CRON_SECRET` (same value as in Vercel env vars).
+
+### 6. Dependabot (`dependabot.yml`)
 
 **Triggers:** Weekly scan on Mondays.
 
@@ -85,8 +97,9 @@ All workflows run on `ubuntu-latest` and are free for public repositories (unlim
 | Deploy | ~10 pushes/month | 3–5 min | ~40 min |
 | Daily watchlist | 30/month | 1–2 min | ~45 min |
 | Weekly full | 4/month | 8–12 min | ~40 min |
+| Hourly alerts | 720/month | <1 min | ~30 min |
 | CI checks | ~15 PRs/month | 2–4 min | ~45 min |
-| **Total** | | | **~170 min/month** |
+| **Total** | | | **~200 min/month** |
 
 Well within GitHub's free tier for public repos (unlimited). Even for private repos, the 2,000 min/month free allowance is more than sufficient.
 

@@ -6,6 +6,14 @@ All notable changes to GrahamScreener are documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.2] - 2026-05-10
+
+### Changed
+- **Migrated hourly alert checks from Vercel Cron to GitHub Actions** — Vercel Hobby (free tier) limits crons to daily, blocking deploy. New `check-alerts.yml` workflow calls the same `/api/cron/check-alerts` endpoint hourly with no frequency limits on public repos.
+- Removed `crons` array from `vercel.json`
+- Added Vercel Pro migration path to `docs/13_ALERTS.md`
+- Added alert check workflow to `docs/14_AUTOMATION.md` usage table
+
 ## [1.4.1] - 2026-05-10
 
 ### Fixed

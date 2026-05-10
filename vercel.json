@@ -17,11 +17,5 @@
     "app/api/cron/check-alerts/route.ts": {
       "maxDuration": 120
     }
-  },
-  "crons": [
-    {
-      "path": "/api/cron/check-alerts",
-      "schedule": "0 */1 * * *"
-    }
-  ]
+  }
 }

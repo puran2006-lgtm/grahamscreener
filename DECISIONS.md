@@ -400,3 +400,15 @@ Every async surface has either skeletons or `<EmptyState>` with a bespoke SVG il
 **Decision:** Removed unused `eq` import from `drizzle-orm` in `src/app/api/alerts/route.ts`.
 
 **Why:** The GET endpoint fetches all alerts (no WHERE clause), and POST uses `.insert()`. Neither uses `eq()`. The import was likely carried over from a template or earlier draft. Removing it is the correct fix — no filtering logic is missing.
+
+---
+
+## v1.5.2 — Vercel Cron → GitHub Actions Migration
+
+### Why move hourly alert checks from Vercel Cron to GitHub Actions
+
+**Decision:** Removed the `crons` array from `vercel.json` and created `.github/workflows/check-alerts.yml` to call the same `/api/cron/check-alerts` endpoint hourly.
+
+**Why:** Vercel Hobby (free tier) limits cron jobs to daily execution. The hourly `0 */1 * * *` schedule was blocking deploy with the error "Hobby accounts are limited to daily cron jobs." GitHub Actions has no cron frequency limits on public repos, so hourly execution works without upgrading to Vercel Pro. The endpoint code is unchanged — only the caller changed from Vercel's cron infrastructure to a GitHub Actions curl. This is consistent with the existing snapshot workflows, which also use GitHub Actions to hit the production Turso database.
+
+**Trade-off:** GitHub Actions cron can be delayed by up to 15 minutes during high-load periods. For value investing alerts (not HFT), this latency is acceptable. Upgrading to Vercel Pro ($20/mo) restores native cron with sub-second scheduling — migration path documented in `docs/13_ALERTS.md`.
