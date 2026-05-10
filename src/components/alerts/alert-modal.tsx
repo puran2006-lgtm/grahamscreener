@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TickerSearch } from "@/components/ticker-search";
 
 type ConditionType = "target_buy" | "stop_loss" | "pct_change_up" | "pct_change_down";
 

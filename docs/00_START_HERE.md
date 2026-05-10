@@ -56,6 +56,9 @@ npm run dev:demo
 | [09_TROUBLESHOOTING.md](./09_TROUBLESHOOTING.md) | Symptom → cause → fix table |
 | [10_ROADMAP.md](./10_ROADMAP.md) | Prioritised next features with effort and API requirements |
 | [11_CHANGELOG.md](./11_CHANGELOG.md) | Version history |
+| [12_DEPLOY.md](./12_DEPLOY.md) | Vercel + Turso deployment guide, GitHub Actions secrets |
+| [13_ALERTS.md](./13_ALERTS.md) | Email price alerts: conditions, Resend setup, cron |
+| [14_AUTOMATION.md](./14_AUTOMATION.md) | GitHub Actions workflows, schedules, debugging |
 
 ## Quick Troubleshooting
 

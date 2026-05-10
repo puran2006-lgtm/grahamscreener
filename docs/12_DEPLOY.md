@@ -164,6 +164,49 @@ Set `DEMO_MODE=true` in Vercel env vars to serve fixture data instead of calling
 
 GrahamScreener easily fits within both free tiers for personal use.
 
+## GitHub Actions Setup
+
+GrahamScreener uses GitHub Actions for automated deployment, scheduled snapshots, CI checks, and dependency updates. All workflows are free for public repositories (unlimited minutes).
+
+### Required Repository Secrets
+
+Add these in your GitHub repo: **Settings → Secrets and variables → Actions → New repository secret**.
+
+| Secret | How to get the value | What it's for |
+|---|---|---|
+| `VERCEL_TOKEN` | Visit [vercel.com/account/tokens](https://vercel.com/account/tokens) → "Create Token" → name it `grahamscreener-actions` → copy | Auto-deploy on push |
+| `VERCEL_ORG_ID` | Run `cat .vercel/project.json` locally — copy the `orgId` value | Identify Vercel scope |
+| `VERCEL_PROJECT_ID` | Run `cat .vercel/project.json` locally — copy the `projectId` value | Identify Vercel project |
+| `TURSO_DATABASE_URL` | Run `turso db show grahamscreener --url` | Snapshot writes to production DB |
+| `TURSO_AUTH_TOKEN` | Run `turso db tokens create grahamscreener` | Snapshot auth |
+
+### Step-by-step
+
+1. **Get Vercel secrets:**
+   ```bash
+   # Create a token at https://vercel.com/account/tokens
+   # Then get org and project IDs:
+   cat .vercel/project.json
+   # Output includes "orgId" and "projectId"
+   ```
+
+2. **Get Turso secrets:**
+   ```bash
+   turso db show grahamscreener --url
+   # → libsql://grahamscreener-yourname.turso.io
+
+   turso db tokens create grahamscreener
+   # → eyJhbGciOi...
+   ```
+
+3. **Add all 5 secrets in GitHub:**
+   - Go to [github.com/puran2006-lgtm/grahamscreener/settings/secrets/actions](https://github.com/puran2006-lgtm/grahamscreener/settings/secrets/actions)
+   - Click "New repository secret" for each of the 5 secrets above
+
+4. **Push to trigger:** `git push origin main` fires the deploy workflow automatically.
+
+See [`docs/14_AUTOMATION.md`](./14_AUTOMATION.md) for full workflow documentation.
+
 ---
 
-Last updated: 2026-05-09 by Claude Cowork (v1.3.1 — async migration complete)
+Last updated: 2026-05-10 by Claude Cowork (v1.5.0 — GitHub Actions automation)

@@ -1,5 +1,10 @@
 # GrahamScreener
 
+[![Deploy](https://github.com/puran2006-lgtm/grahamscreener/actions/workflows/deploy.yml/badge.svg)](https://github.com/puran2006-lgtm/grahamscreener/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![Live](https://img.shields.io/badge/live-grahamscreener.com-success)](https://grahamscreener.com)
+[![GitHub stars](https://img.shields.io/github/stars/puran2006-lgtm/grahamscreener?style=social)](https://github.com/puran2006-lgtm/grahamscreener/stargazers)
+
 Graham-discipline value screener for ASX, BSE, NSE, and US equities.
 
 Premium dark-mode UI, all data sourced live (and free) from Yahoo Finance, with a local SQLite store for your watchlist, portfolio, and a fundamentals snapshot cache.

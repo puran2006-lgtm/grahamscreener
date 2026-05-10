@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getDb, schema } from "@/lib/db";
-import { eq } from "drizzle-orm";
 import { exchangeFromTicker } from "@/lib/utils";
 
 export const runtime = "nodejs";

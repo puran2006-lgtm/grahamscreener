@@ -1,0 +1,66 @@
+name: Weekly Full Snapshot
+
+on:
+  schedule:
+    - cron: "0 16 * * 0" # 4pm UTC Sunday = 2am AEST Monday
+  workflow_dispatch:
+
+jobs:
+  snapshot:
+    name: Snapshot full 200-ticker universe
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+      TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run full snapshot (attempt 1)
+        id: attempt1
+        continue-on-error: true
+        run: npm run snapshot
+
+      - name: Wait before retry
+        if: steps.attempt1.outcome == 'failure'
+        run: sleep 300
+
+      - name: Run full snapshot (attempt 2)
+        id: attempt2
+        if: steps.attempt1.outcome == 'failure'
+        continue-on-error: true
+        run: npm run snapshot
+
+      - name: Write failure log
+        if: steps.attempt1.outcome == 'failure' && steps.attempt2.outcome == 'failure'
+        run: |
+          echo "Full universe snapshot failed after 2 attempts." > failure.md
+          echo "" >> failure.md
+          echo "**Workflow:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> failure.md
+          echo "**Date:** $(date -u '+%Y-%m-%d %H:%M UTC')" >> failure.md
+          echo "" >> failure.md
+          echo "Check the workflow logs for error details." >> failure.md
+
+      - name: Open failure issue
+        if: steps.attempt1.outcome == 'failure' && steps.attempt2.outcome == 'failure'
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "[Auto] Full snapshot failed $(date -u '+%Y-%m-%d')"
+          content-filepath: failure.md
+          labels: automation-failure
+
+      - name: Fail workflow if both attempts failed
+        if: steps.attempt1.outcome == 'failure' && steps.attempt2.outcome == 'failure'
+        run: exit 1

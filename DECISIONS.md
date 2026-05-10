@@ -352,3 +352,51 @@ Every async surface has either skeletons or `<EmptyState>` with a bespoke SVG il
 **Why:** React Email adds 3 dependencies (`@react-email/components`, `@react-email/render`, plus their transitive deps) and requires a JSX-to-HTML render step. For a single email template with mostly static content, raw HTML is simpler, has zero runtime deps, and is easier to debug. The template uses inline styles and table layout for maximum email client compatibility.
 
 **Trade-off:** Adding more email templates (welcome, digest, etc.) would benefit from React Email's component model. If the app grows to 3+ templates, migrating to React Email would be worth the dependency cost.
+
+---
+
+## v1.5 — GitHub Actions Automation
+
+### Why GitHub Actions instead of Vercel's native Git integration
+
+**Decision:** Use GitHub Actions workflows for deployment instead of Vercel's built-in GitHub integration.
+
+**Why:** Vercel's native Git integration deploys on push but skips the type-check and lint steps — a broken type-check still deploys. GitHub Actions lets us chain `tsc --noEmit` → `npm run lint` → `npm run build` → `vercel deploy`, so a failing type-check blocks the deploy. It also gives us scheduled jobs (snapshot cron), CI checks on PRs, and full control over retry logic and failure notifications. Free for public repos (unlimited minutes).
+
+**Trade-off:** Slightly more complex setup (5 repository secrets vs zero config). Worth it for the quality gate and scheduled automation.
+
+### Why daily watchlist + weekly full snapshot
+
+**Decision:** Run watchlist-only snapshot daily at 8am AEST; full 200-ticker universe weekly on Sunday night.
+
+**Why:** Watchlist tickers (5–20) are the ones the user actively monitors — fresh data matters most here. The full universe is used by the screener, which tolerates slightly stale data (the 24h cache TTL handles intra-week freshness). Running 200 tickers daily would hit Yahoo rate limits and waste GitHub Actions minutes. Weekly full + daily watchlist balances freshness against rate-limit risk.
+
+**Trade-off:** Screener data can be up to 7 days stale between Sunday runs. Acceptable for value investing (fundamentals don't change daily). User can manually trigger a full snapshot anytime via the Actions tab.
+
+### Why MIT license
+
+**Decision:** MIT license for the open-source repository.
+
+**Why:** Most permissive widely-used OSS license. Allows commercial use, modification, and redistribution with only the requirement to preserve the license text. Common for developer tools and screeners. Doesn't require derivative works to be open-source (unlike GPL). The copyright uses the GitHub handle (`puran2006-lgtm`) rather than real name for privacy.
+
+### Why grouped Dependabot updates
+
+**Decision:** Group patch and minor dependency updates into a single PR; major versions get individual PRs.
+
+**Why:** Ungrouped Dependabot creates one PR per package update — a project with 30+ dependencies can generate 10+ PRs per week. Grouping patch/minor into one PR reduces noise while still catching breaking changes (major bumps) individually. GitHub Actions versions are also tracked to keep workflow action pinning current.
+
+---
+
+## v1.4.1 — Lint Fix Patch
+
+### Why remove TickerSearch import instead of wiring it into the alert modal
+
+**Decision:** Removed the unused `TickerSearch` import from `alert-modal.tsx` rather than integrating ticker autocomplete into the modal.
+
+**Why:** The existing `TickerSearch` component calls `router.push()` on selection — it's designed for page navigation, not form-field population. Wiring it into the modal would require adding an `onSelect` callback prop, suppressing the router.push, and handling the selected ticker as form state. That's a feature enhancement, not a lint fix. The plain `<Input>` works correctly for ticker entry. Autocomplete in the alert modal is deferred to a future release.
+
+### Why remove eq import from alerts route
+
+**Decision:** Removed unused `eq` import from `drizzle-orm` in `src/app/api/alerts/route.ts`.
+
+**Why:** The GET endpoint fetches all alerts (no WHERE clause), and POST uses `.insert()`. Neither uses `eq()`. The import was likely carried over from a template or earlier draft. Removing it is the correct fix — no filtering logic is missing.

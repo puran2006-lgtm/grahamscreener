@@ -6,6 +6,27 @@ All notable changes to GrahamScreener are documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.4.1] - 2026-05-10
+
+### Fixed
+- Removed unused `eq` import from `drizzle-orm` in `src/app/api/alerts/route.ts` (lint error: `@typescript-eslint/no-unused-vars`)
+- Removed unused `TickerSearch` import in `src/components/alerts/alert-modal.tsx` (lint error: `@typescript-eslint/no-unused-vars`). The existing `TickerSearch` component navigates on selection and lacks an `onSelect` callback, making it incompatible with the modal's form-field pattern. Ticker autocomplete in the alert modal is deferred to a future release.
+
+## [1.5.0] - 2026-05-10
+
+### Added
+- **GitHub Actions auto-deploy** — push to `main` triggers type-check → build → deploy to Vercel via CLI (`deploy.yml`)
+- **Daily watchlist snapshot** — cron at 8am AEST fetches fresh Yahoo data for watchlist tickers into production Turso (`snapshot-watchlist.yml`)
+- **Weekly full universe snapshot** — cron Sunday 2am AEST refreshes all 200 tickers (`snapshot-full.yml`)
+- **CI checks on PRs** — lint, type-check, and build run on every pull request and non-main branch push (`ci.yml`)
+- **Dependabot** — weekly npm + GitHub Actions dependency updates, grouped patch/minor PRs, auto-assigned (`dependabot.yml`)
+- **LICENSE** file (MIT, copyright puran2006-lgtm)
+- README status badges: deploy, license, live site, GitHub stars
+- `docs/14_AUTOMATION.md` — full GitHub Actions documentation
+- GitHub Actions secrets setup guide in `docs/12_DEPLOY.md`
+- Automatic GitHub Issue creation on snapshot workflow failure (label: `automation-failure`)
+- Retry-once policy on snapshot workflows (5-min wait between attempts)
+
 ## [1.4.0] - 2026-05-10
 
 ### Added
