@@ -59,6 +59,7 @@ npm run dev:demo
 | [12_DEPLOY.md](./12_DEPLOY.md) | Vercel + Turso deployment guide, GitHub Actions secrets |
 | [13_ALERTS.md](./13_ALERTS.md) | Email price alerts: conditions, Resend setup, cron |
 | [14_AUTOMATION.md](./14_AUTOMATION.md) | GitHub Actions workflows, schedules, debugging |
+| [16_EMAIL_SETUP.md](./16_EMAIL_SETUP.md) | Cloudflare Email Routing + Resend setup, DKIM/SPF |
 
 ## Quick Troubleshooting
 

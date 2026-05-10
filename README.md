@@ -104,3 +104,8 @@ See [`DECISIONS.md`](./DECISIONS.md) for the full set of architectural choices a
 ## Data Source
 
 Yahoo Finance (free, unauthenticated). See [`docs/06_DATA_SOURCE.md`](./docs/06_DATA_SOURCE.md) for endpoints, rate limits, cache TTLs, and alternative provider options.
+
+## Contact
+
+- General: [hello@grahamscreener.com](mailto:hello@grahamscreener.com)
+- Partnerships: [partnerships@grahamscreener.com](mailto:partnerships@grahamscreener.com)

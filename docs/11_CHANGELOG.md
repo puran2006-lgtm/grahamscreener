@@ -6,6 +6,30 @@ All notable changes to GrahamScreener are documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.5] - 2026-05-10
+
+### Fixed
+- **Alert emails never reaching Resend** — added comprehensive diagnostics to `/api/cron/check-alerts` so the JSON response body (captured by GitHub Actions) now includes: active alert count, per-alert price fetch + condition evaluation + email send result, environment variable status, and a full trace log
+- **Silent failures invisible** — `sendPriceAlert` now logs Resend request/response details to console
+
+### Added
+- **`/api/debug/alerts` endpoint** (TEMPORARY) — returns all alerts in DB + environment variable status for production debugging. Delete after confirming emails work.
+- Diagnostic `details[]` array in check-alerts response showing per-alert: ticker, current price, condition result, debounce status, email send outcome
+
+## [1.5.4] - 2026-05-10
+
+### Added
+- **Reply-To header** on alert emails — replies go to `hello@grahamscreener.com` instead of the no-reply alerts address
+- **Footer** in app layout with copyright, email link, and GitHub link
+- **`/about` page** with product description, founder note, contact emails, and open-source links
+- **Contact section** in README with `hello@` and `partnerships@` addresses
+- `.env.example` with all environment variables documented
+- `docs/16_EMAIL_SETUP.md` — Cloudflare Email Routing + Resend setup guide with DKIM/SPF records and Gmail "Send mail as" instructions
+
+### Changed
+- `ALERT_REPLY_TO` env var added to alert email code (default: `hello@grahamscreener.com`)
+- Updated env var tables in `docs/12_DEPLOY.md` and `docs/13_ALERTS.md`
+
 ## [1.5.3] - 2026-05-10
 
 ### Changed

@@ -86,7 +86,8 @@ This sends a sample alert email (AAPL target buy at $165, current price $162.50)
 |---|---|---|---|
 | `RESEND_API_KEY` | Yes (for alerts) | — | Resend API key (starts with `re_`) |
 | `ALERT_FROM_EMAIL` | No | `alerts@grahamscreener.com` | Sender address (needs DNS setup unless using `onboarding@resend.dev`) |
-| `CRON_SECRET` | Yes (for cron) | — | Vercel cron auth token |
+| `ALERT_REPLY_TO` | No | `hello@grahamscreener.com` | Reply-To address on alert emails — routes replies to support inbox |
+| `CRON_SECRET` | Yes (for cron) | — | Auth token for the check-alerts endpoint |
 | `TEST_EMAIL` | No | — | Your email for `npm run test-email` |
 
 ## Privacy

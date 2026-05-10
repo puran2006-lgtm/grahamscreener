@@ -104,24 +104,31 @@ export async function sendPriceAlert(
 
   const fromAddress =
     process.env.ALERT_FROM_EMAIL ?? "alerts@grahamscreener.com";
+  const replyTo =
+    process.env.ALERT_REPLY_TO ?? "hello@grahamscreener.com";
 
   const conditionLabel = CONDITION_LABELS[alert.conditionType] ?? alert.conditionType;
   const subject = `${alert.ticker}: ${conditionLabel} — $${currentPrice.toFixed(2)}`;
 
   try {
+    console.log(`[email] Sending via Resend: from=${fromAddress}, to=${alert.userEmail}, subject=${subject}`);
     const resend = new Resend(apiKey);
     const { data, error } = await resend.emails.send({
       from: `GrahamScreener <${fromAddress}>`,
+      replyTo,
       to: [alert.userEmail],
       subject,
       html: buildAlertHtml(alert, currentPrice),
     });
 
     if (error) {
+      console.error(`[email] Resend error:`, JSON.stringify(error));
       return { success: false, error: error.message };
     }
+    console.log(`[email] Resend success: id=${data?.id}`);
     return { success: true, id: data?.id };
   } catch (err) {
+    console.error(`[email] Resend exception:`, (err as Error).message);
     return { success: false, error: (err as Error).message };
   }
 }

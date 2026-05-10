@@ -67,6 +67,7 @@ This populates the watchlist with 5 sample tickers (CBA.AX, RELIANCE.BO, INFY.NS
 | `CRON_SECRET` | Random string for cron auth (generate with `openssl rand -hex 32`) |
 | `RESEND_API_KEY` | Resend API key (sign up at resend.com — free 100/day) |
 | `ALERT_FROM_EMAIL` | `onboarding@resend.dev` (or `alerts@grahamscreener.com` after DNS setup) |
+| `ALERT_REPLY_TO` | `hello@grahamscreener.com` (reply-to address on alert emails) |
 
 5. Deploy
 
@@ -85,6 +86,7 @@ vercel env add TURSO_AUTH_TOKEN
 vercel env add CRON_SECRET
 vercel env add RESEND_API_KEY
 vercel env add ALERT_FROM_EMAIL
+vercel env add ALERT_REPLY_TO
 
 # Deploy
 vercel --prod

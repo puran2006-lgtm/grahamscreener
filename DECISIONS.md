@@ -422,3 +422,25 @@ Every async surface has either skeletons or `<EmptyState>` with a bespoke SVG il
 **Decision:** Added `ignore: [{ dependency-name: "*", update-types: ["version-update:semver-major"] }]` to both npm and github-actions ecosystems in `.github/dependabot.yml`.
 
 **Why:** Dependabot opened 9 PRs proposing major version bumps (Next 14→16, React 18→19, Tailwind 3→4, ESLint 8→10, TypeScript 5→6, @types/node 20→25, plus GitHub Actions majors). All failed CI because major bumps routinely introduce breaking changes — Tailwind v4 is a complete paradigm shift, React 19 changes the rendering model, Next 16 drops APIs we use. Auto-PRing these creates noise without value. Patch and minor updates remain auto-grouped weekly (safe, non-breaking by semver convention). Major upgrades are done manually when the ecosystem stabilises and migration guides are available.
+
+---
+
+## v1.5.4 — Email Addresses + Reply-To + About Page
+
+### Why 3 separate email addresses
+
+**Decision:** Set up `alerts@`, `hello@`, and `partnerships@` as distinct addresses on `grahamscreener.com`.
+
+**Why:** Separation of concerns. `alerts@` is outbound-only (Resend transactional) — if it gets flagged as spam, support communication via `hello@` is unaffected. `hello@` is the user-facing support address, used as Reply-To on alert emails so replies land in a monitored inbox, not a no-reply void. `partnerships@` is for sponsor/business communication — keeping it separate from support makes filtering and delegation easier as the project grows. All three forward to the same personal inbox via Cloudflare Email Routing (zero cost), so there's no operational overhead now, but the separation scales cleanly if roles are later delegated.
+
+### Why Reply-To header on alert emails
+
+**Decision:** Added `reply_to: process.env.ALERT_REPLY_TO ?? 'hello@grahamscreener.com'` to the Resend send call.
+
+**Why:** Without Reply-To, users who reply to an alert email would send to `alerts@grahamscreener.com`, which is a send-only address. Setting Reply-To to `hello@` routes replies to the support inbox. This is standard practice for transactional email — the From address handles deliverability (DKIM/SPF), the Reply-To handles human conversation.
+
+### Why full diagnostics in check-alerts response body (v1.5.5)
+
+**Decision:** The `/api/cron/check-alerts` endpoint now returns a detailed JSON body with per-alert evaluation traces, environment variable status, and a `log[]` array — instead of just `{ checked, triggered, failed }`.
+
+**Why:** The endpoint returned HTTP 200 with zero emails sent and no way to determine why. GitHub Actions only captures the response body (not server-side stderr), so `console.error` was invisible. The original response had no way to distinguish "zero alerts in DB" from "alerts exist but condition not met" from "Resend key missing" from "Yahoo API threw". A temporary `/api/debug/alerts` endpoint was also added to inspect DB state and env vars directly — must be removed after diagnosis.

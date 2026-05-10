@@ -14,6 +14,8 @@ import {
   CommandIcon,
   HeartPulse,
   BookOpen,
+  ExternalLink,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -182,6 +184,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
           {children}
         </div>
+
+        {/* Footer */}
+        <footer className="border-t border-border/40 bg-card/20 px-4 sm:px-6 lg:px-8 py-6">
+          <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
+            <span>&copy; {new Date().getFullYear()} GrahamScreener</span>
+            <div className="flex items-center gap-4">
+              <a
+                href="mailto:hello@grahamscreener.com"
+                className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors"
+              >
+                <Mail className="h-3.5 w-3.5" />
+                hello@grahamscreener.com
+              </a>
+              <a
+                href="https://github.com/puran2006-lgtm/grahamscreener"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                GitHub
+              </a>
+            </div>
+          </div>
+        </footer>
 
         {/* Mobile nav */}
         <nav className="md:hidden sticky bottom-0 z-30 grid grid-cols-5 gap-1 border-t border-border/50 bg-background/90 backdrop-blur px-2 py-2">
