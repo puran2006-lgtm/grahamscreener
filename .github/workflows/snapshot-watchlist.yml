@@ -55,7 +55,7 @@ jobs:
 
       - name: Open failure issue
         if: steps.attempt1.outcome == 'failure' && steps.attempt2.outcome == 'failure'
-        uses: peter-evans/create-issue-from-file@v5
+        uses: peter-evans/create-issue-from-file@v6
         with:
           title: "[Auto] Watchlist snapshot failed $(date -u '+%Y-%m-%d')"
           content-filepath: failure.md
