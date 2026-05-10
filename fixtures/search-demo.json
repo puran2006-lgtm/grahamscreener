@@ -1,0 +1,21 @@
+{
+  "AAPL": [
+    { "symbol": "AAPL", "shortname": "Apple Inc.", "longname": "Apple Inc.", "exchDisp": "NASDAQ", "typeDisp": "Equity", "exchange": "NMS" }
+  ],
+  "BRK": [
+    { "symbol": "BRK-B", "shortname": "Berkshire Hathaway", "longname": "Berkshire Hathaway Inc.", "exchDisp": "NYSE", "typeDisp": "Equity", "exchange": "NYQ" },
+    { "symbol": "BRK-A", "shortname": "Berkshire Hathaway", "longname": "Berkshire Hathaway Inc.", "exchDisp": "NYSE", "typeDisp": "Equity", "exchange": "NYQ" }
+  ],
+  "CBA": [
+    { "symbol": "CBA.AX", "shortname": "CBA", "longname": "Commonwealth Bank of Australia", "exchDisp": "ASX", "typeDisp": "Equity", "exchange": "ASX" }
+  ],
+  "RELIANCE": [
+    { "symbol": "RELIANCE.BO", "shortname": "Reliance Ind", "longname": "Reliance Industries Limited", "exchDisp": "BSE", "typeDisp": "Equity", "exchange": "BSE" },
+    { "symbol": "RELIANCE.NS", "shortname": "Reliance Ind", "longname": "Reliance Industries Limited", "exchDisp": "NSE", "typeDisp": "Equity", "exchange": "NSE" }
+  ],
+  "INFY": [
+    { "symbol": "INFY.NS", "shortname": "Infosys", "longname": "Infosys Limited", "exchDisp": "NSE", "typeDisp": "Equity", "exchange": "NSE" },
+    { "symbol": "INFY.BO", "shortname": "Infosys", "longname": "Infosys Limited", "exchDisp": "BSE", "typeDisp": "Equity", "exchange": "BSE" },
+    { "symbol": "INFY", "shortname": "Infosys", "longname": "Infosys Limited", "exchDisp": "NYSE", "typeDisp": "Equity", "exchange": "NYQ" }
+  ]
+}

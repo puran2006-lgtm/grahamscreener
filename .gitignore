@@ -34,3 +34,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# secrets and local data (added before first push)
+.env
+.env.*
+!.env.example
+data/
+*.db
+*.sqlite
+*.sqlite3
+.turso/
+turso-tokens.txt
+secrets.txt
+credentials.txt
+*.token

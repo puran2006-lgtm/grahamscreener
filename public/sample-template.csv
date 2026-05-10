@@ -1,0 +1,7 @@
+ticker,side,quantity,price,fees,date,notes
+AAPL,BUY,10,185.50,9.95,2024-01-15,Initial position
+AAPL,BUY,5,172.30,9.95,2024-03-20,Averaging down
+CBA.AX,BUY,50,110.25,19.95,2024-02-01,Core ASX holding
+RELIANCE.BO,BUY,20,2450.00,0,2024-04-10,BSE value play
+INFY.NS,BUY,100,1580.00,0,2024-05-05,NSE tech exposure
+AAPL,SELL,5,195.00,9.95,2024-06-01,Partial profit-take
