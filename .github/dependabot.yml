@@ -1,31 +1,47 @@
 version: 2
 
 updates:
-  - package-ecosystem: npm
-    directory: /
+  # npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
-      interval: weekly
-      day: monday
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "Australia/Adelaide"
+    open-pull-requests-limit: 5
     assignees:
-      - puran2006-lgtm
+      - "puran2006-lgtm"
     labels:
-      - dependencies
+      - "dependencies"
     commit-message:
-      prefix: "chore(deps):"
+      prefix: "chore(deps)"
     groups:
-      patch-and-minor:
+      patches:
         update-types:
-          - minor
-          - patch
+          - "patch"
+      minors:
+        update-types:
+          - "minor"
+    ignore:
+      # Block all major version bumps — require manual review
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
-  - package-ecosystem: github-actions
-    directory: /
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: weekly
-      day: monday
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
     assignees:
-      - puran2006-lgtm
+      - "puran2006-lgtm"
     labels:
-      - dependencies
+      - "dependencies"
+      - "github-actions"
     commit-message:
-      prefix: "chore(deps):"
+      prefix: "chore(actions)"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

@@ -54,11 +54,38 @@ Calls the live `GET /api/cron/check-alerts` endpoint with `CRON_SECRET` auth. Th
 
 ### 6. Dependabot (`dependabot.yml`)
 
-**Triggers:** Weekly scan on Mondays.
+**Triggers:** Weekly scan on Mondays (8:00 AM ACST for npm).
 
-Checks for npm dependency updates and GitHub Actions version bumps. Patch and minor updates are grouped into a single PR to reduce noise. Major version bumps each get their own PR for individual review.
+Checks for npm dependency updates and GitHub Actions version bumps. Patch updates are grouped into one PR, minor updates into another. **Major version bumps are ignored** — they require manual review since they routinely introduce breaking changes (e.g., Next 14→16, React 18→19, Tailwind 3→4).
 
-All PRs are auto-assigned to `puran2006-lgtm` and labelled `dependencies`.
+All PRs are auto-assigned to `puran2006-lgtm` and labelled `dependencies` (GitHub Actions PRs also get `github-actions`).
+
+**PR limits:** 5 open npm PRs, 3 open GitHub Actions PRs at any time.
+
+### How to manually upgrade a major version
+
+When you're ready to adopt a major version bump:
+
+```bash
+# 1. Check what's available
+npm outdated
+
+# 2. Install the new major version
+npm install next@latest react@latest react-dom@latest
+
+# 3. Test locally
+npm run lint
+npx tsc --noEmit
+npm run build
+npm run dev  # manual smoke test
+
+# 4. Fix any breaking changes, then commit
+git add .
+git commit -m "chore(deps): upgrade next to v16, react to v19"
+git push origin main
+```
+
+Always read the migration guide for the package before upgrading. Major versions often require code changes.
 
 ## How To
 

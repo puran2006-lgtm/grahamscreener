@@ -412,3 +412,13 @@ Every async surface has either skeletons or `<EmptyState>` with a bespoke SVG il
 **Why:** Vercel Hobby (free tier) limits cron jobs to daily execution. The hourly `0 */1 * * *` schedule was blocking deploy with the error "Hobby accounts are limited to daily cron jobs." GitHub Actions has no cron frequency limits on public repos, so hourly execution works without upgrading to Vercel Pro. The endpoint code is unchanged — only the caller changed from Vercel's cron infrastructure to a GitHub Actions curl. This is consistent with the existing snapshot workflows, which also use GitHub Actions to hit the production Turso database.
 
 **Trade-off:** GitHub Actions cron can be delayed by up to 15 minutes during high-load periods. For value investing alerts (not HFT), this latency is acceptable. Upgrading to Vercel Pro ($20/mo) restores native cron with sub-second scheduling — migration path documented in `docs/13_ALERTS.md`.
+
+---
+
+## v1.5.3 — Tame Dependabot Major Version Bumps
+
+### Why ignore all major version bumps in Dependabot
+
+**Decision:** Added `ignore: [{ dependency-name: "*", update-types: ["version-update:semver-major"] }]` to both npm and github-actions ecosystems in `.github/dependabot.yml`.
+
+**Why:** Dependabot opened 9 PRs proposing major version bumps (Next 14→16, React 18→19, Tailwind 3→4, ESLint 8→10, TypeScript 5→6, @types/node 20→25, plus GitHub Actions majors). All failed CI because major bumps routinely introduce breaking changes — Tailwind v4 is a complete paradigm shift, React 19 changes the rendering model, Next 16 drops APIs we use. Auto-PRing these creates noise without value. Patch and minor updates remain auto-grouped weekly (safe, non-breaking by semver convention). Major upgrades are done manually when the ecosystem stabilises and migration guides are available.

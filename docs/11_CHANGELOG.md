@@ -6,6 +6,15 @@ All notable changes to GrahamScreener are documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.3] - 2026-05-10
+
+### Changed
+- **Dependabot now ignores all major version bumps** — `ignore: [{ dependency-name: "*", update-types: ["version-update:semver-major"] }]` added to both npm and github-actions ecosystems. Patch and minor updates remain auto-grouped weekly. Major upgrades require manual `npm install <pkg>@latest` after reading the migration guide.
+- Separated npm patches and minors into distinct Dependabot groups
+- Added `github-actions` label to Actions dependency PRs
+- Added PR limits: 5 npm, 3 Actions
+- Added ACST-aware schedule (`08:00 Australia/Adelaide`)
+
 ## [1.5.2] - 2026-05-10
 
 ### Changed
