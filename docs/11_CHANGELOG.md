@@ -6,6 +6,29 @@ All notable changes to GrahamScreener are documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.9] - 2026-05-11
+
+### Changed
+- **Production alert emails now send from `alerts@grahamscreener.com`** — Resend domain verification completed for `grahamscreener.com`. Updated `ALERT_FROM_EMAIL` Vercel env var from `onboarding@resend.dev` (sandbox) to `alerts@grahamscreener.com`. Emails now deliver to any recipient, not just the Resend account owner.
+- **Alert emails verified end-to-end in production** — confirmed delivery to `puran.2006@gmail.com` from `alerts@grahamscreener.com` (Resend ID: `8f97003a-59d1-42c6-9de2-c936698af9b2`). Production cron workflow (Hourly Alert Check #22) ran successfully.
+
+### Removed
+- **`/api/debug/test-email` endpoint** — temporary endpoint for direct Resend email testing. No longer needed after domain verification.
+- **`/api/debug/alerts` endpoint** — temporary endpoint for dumping all alerts + cache + environment status. No longer needed.
+- **`/api/debug/seed-cache` endpoint** — temporary endpoint for seeding snapshot_cache with test data. No longer needed.
+
+## [1.5.8] - 2026-05-11
+
+### Fixed
+- **Alert emails now deliver successfully** — diagnosed and resolved end-to-end email delivery failure. Root cause: Resend sandbox mode (`onboarding@resend.dev`) restricts recipients to the account owner's email only. Verified email pipeline works (Resend ID: `90656969-782d-4be9-a865-cee6b3b72766`). Production fix requires verifying `grahamscreener.com` domain on Resend and switching `ALERT_FROM_EMAIL` to `alerts@grahamscreener.com`.
+- **`/api/cron/check-alerts` now supports `?testPrice=N` query param** — bypasses cache and Yahoo entirely, useful for testing alert condition evaluation without live market data
+
+### Added
+- **`/api/debug/test-email` endpoint** (TEMPORARY) — directly tests Resend email delivery for AAPL alert, bypassing cache/Yahoo/condition logic. Delete after domain verification.
+
+### Changed
+- **`/api/debug/seed-cache` endpoint** updated — now also updates alert threshold and email, clears debounce, and reads back both rows to verify Turso persistence
+
 ## [1.5.7] - 2026-05-11
 
 ### Added
