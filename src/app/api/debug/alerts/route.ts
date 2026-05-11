@@ -5,15 +5,16 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * TEMPORARY debug endpoint — lists all alerts and environment status.
+ * TEMPORARY debug endpoint — lists all alerts, cache rows, and environment status.
  * DELETE THIS FILE after diagnosing the email issue.
  */
 export async function GET() {
   const db = await getDb();
   const allAlerts = await db.select().from(schema.alerts).all();
+  const allCache = await db.select().from(schema.snapshotCache).all();
 
   return NextResponse.json({
-    count: allAlerts.length,
+    alertCount: allAlerts.length,
     alerts: allAlerts.map((a) => ({
       id: a.id,
       ticker: a.ticker,
@@ -27,6 +28,14 @@ export async function GET() {
       lastFiredAt: a.lastFiredAt,
       createdAt: a.createdAt,
       notes: a.notes,
+    })),
+    cacheCount: allCache.length,
+    cache: allCache.map((c) => ({
+      ticker: c.ticker,
+      exchange: c.exchange,
+      fetchedAt: c.fetchedAt,
+      ageMinutes: Math.round((Date.now() - c.fetchedAt) / 60000),
+      payloadPreview: c.payload.substring(0, 120),
     })),
     environment: {
       hasResendKey: !!process.env.RESEND_API_KEY,
