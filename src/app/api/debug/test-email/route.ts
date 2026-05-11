@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic";
  * TEMPORARY — directly test email delivery for the AAPL alert.
  * Bypasses cache lookup and Yahoo entirely.
  * Uses a hardcoded test price so the only variable is Resend.
+ * Overrides recipient to Resend account owner (sandbox limitation).
  * DELETE THIS FILE after confirming emails work.
  */
 export async function GET() {
@@ -30,8 +31,11 @@ export async function GET() {
       return NextResponse.json({ error: "No active AAPL alert found" });
     }
 
+    // Override recipient to Resend account owner (sandbox can only send to this)
+    const alertForEmail = { ...alert, userEmail: "hello@grahamscreener.com" };
+
     // Send email directly — no condition check, no debounce
-    const result = await sendPriceAlert(alert, testPrice);
+    const result = await sendPriceAlert(alertForEmail, testPrice);
 
     return NextResponse.json({
       success: result.success,
@@ -40,7 +44,8 @@ export async function GET() {
       alert: {
         id: alert.id,
         ticker: alert.ticker,
-        email: alert.userEmail,
+        email: alertForEmail.userEmail,
+        originalEmail: alert.userEmail,
         conditionType: alert.conditionType,
         threshold: alert.threshold,
       },
