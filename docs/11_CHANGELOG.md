@@ -6,6 +6,11 @@ All notable changes to GrahamScreener are documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.7] - 2026-05-11
+
+### Added
+- **`/api/debug/seed-cache` endpoint** (TEMPORARY) — POST endpoint that upserts a test AAPL price ($200.50) into `snapshot_cache` for end-to-end alert email verification. Delete after confirming emails work.
+
 ## [1.5.6] - 2026-05-10
 
 ### Changed
