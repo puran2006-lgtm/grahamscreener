@@ -11,6 +11,9 @@ export const maxDuration = 120;
 /** 24h debounce — don't re-fire the same alert within a day. */
 const DEBOUNCE_MS = 24 * 60 * 60 * 1000;
 
+/** 25h staleness window — cache entries older than this trigger Yahoo fallback. */
+const CACHE_MAX_AGE_MS = 25 * 60 * 60 * 1000;
+
 /** Diagnostic detail for one alert evaluation. */
 interface AlertDiag {
   id: number;
@@ -19,6 +22,7 @@ interface AlertDiag {
   threshold: number;
   email: string;
   currentPrice: number | null;
+  priceSource: string;
   shouldFire: boolean;
   debounced: boolean;
   emailSent: boolean;
@@ -83,31 +87,77 @@ export async function GET(req: NextRequest) {
       threshold: alert.threshold,
       email: alert.userEmail,
       currentPrice: null,
+      priceSource: "none",
       shouldFire: false,
       debounced: false,
       emailSent: false,
     };
 
     try {
-      // Get current price
+      // Get current price — cache-first, Yahoo fallback
       push(`Fetching price for ${alert.ticker}...`);
-      const fundamentals = await yahooFundamentals(alert.ticker);
-      const currentPrice = fundamentals.price;
-      diag.currentPrice = currentPrice ?? null;
+      let currentPrice: number | null | undefined = null;
+      let priceSource = "none";
+
+      // 1. Try snapshot_cache (populated by GitHub Actions snapshots)
+      const cached = await db.select().from(schema.snapshotCache)
+        .where(eq(schema.snapshotCache.ticker, alert.ticker))
+        .get();
+
+      if (cached && (now - cached.fetchedAt) < CACHE_MAX_AGE_MS) {
+        // Cache hit — parse price from JSON payload
+        try {
+          const payload = JSON.parse(cached.payload);
+          if (payload.price && payload.price > 0) {
+            currentPrice = payload.price;
+            priceSource = "cache";
+            push(`  ${alert.ticker} cache HIT — price=$${currentPrice}, age=${Math.round((now - cached.fetchedAt) / 60000)}m`);
+          } else {
+            push(`  ${alert.ticker} cache HIT but price missing/zero in payload — falling back to Yahoo`);
+          }
+        } catch {
+          push(`  ${alert.ticker} cache HIT but payload parse failed — falling back to Yahoo`);
+        }
+      } else if (cached) {
+        push(`  ${alert.ticker} cache STALE — age=${Math.round((now - cached.fetchedAt) / 60000)}m, falling back to Yahoo`);
+      } else {
+        push(`  ${alert.ticker} cache MISS — falling back to Yahoo`);
+      }
+
+      // 2. Yahoo fallback only if cache didn't provide a valid price
+      if (!currentPrice || currentPrice <= 0) {
+        try {
+          const fundamentals = await yahooFundamentals(alert.ticker);
+          if (fundamentals.price && fundamentals.price > 0) {
+            currentPrice = fundamentals.price;
+            priceSource = "yahoo";
+            push(`  ${alert.ticker} Yahoo fallback OK — price=$${currentPrice}`);
+          } else {
+            push(`  ${alert.ticker} Yahoo returned null/zero price`);
+          }
+        } catch (yahooErr) {
+          push(`  ${alert.ticker} Yahoo fallback FAILED: ${(yahooErr as Error).message}`);
+        }
+      }
+
+      // 3. If both failed, skip this alert (don't fail the whole batch)
+      if (!currentPrice || currentPrice <= 0) {
+        push(`  ${alert.ticker} — no price from cache or Yahoo, skipping`);
+        diag.currentPrice = null;
+        details.push(diag);
+        continue;
+      }
+
+      diag.currentPrice = currentPrice;
+      diag.priceSource = priceSource;
       checked++;
-      push(`  ${alert.ticker} price = ${currentPrice ?? "null"}`);
+      push(`  ${alert.ticker} price = $${currentPrice} (source: ${priceSource})`);
 
       // Update last_checked_at
       await db.update(schema.alerts)
         .set({ lastCheckedAt: now })
         .where(eq(schema.alerts.id, alert.id))
         .run();
-
-      if (currentPrice === null || currentPrice === undefined || currentPrice <= 0) {
-        push(`  ${alert.ticker} — skipped: price is null/zero`);
-        details.push(diag);
-        continue;
-      }
 
       // Evaluate condition
       let shouldFire = false;

@@ -6,6 +6,15 @@ All notable changes to GrahamScreener are documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.6] - 2026-05-10
+
+### Changed
+- **Alert checker now uses cache-first pricing** — `/api/cron/check-alerts` reads from `snapshot_cache` table (populated by GitHub Actions snapshots) instead of calling Yahoo directly. Yahoo is only used as a fallback when cache is missing or stale (>25 hours). If both fail, the individual alert is skipped without crashing the batch.
+- Added `priceSource` field to alert diagnostics — logs and JSON response now show whether price came from `cache`, `yahoo`, or `none`
+
+### Fixed
+- **Yahoo 429 errors on Vercel** — Vercel's shared IP pool triggers Yahoo rate-limits. Cache-first approach eliminates Yahoo calls in the common case (daily snapshot keeps cache <25h old)
+
 ## [1.5.5] - 2026-05-10
 
 ### Fixed

@@ -444,3 +444,9 @@ Every async surface has either skeletons or `<EmptyState>` with a bespoke SVG il
 **Decision:** The `/api/cron/check-alerts` endpoint now returns a detailed JSON body with per-alert evaluation traces, environment variable status, and a `log[]` array — instead of just `{ checked, triggered, failed }`.
 
 **Why:** The endpoint returned HTTP 200 with zero emails sent and no way to determine why. GitHub Actions only captures the response body (not server-side stderr), so `console.error` was invisible. The original response had no way to distinguish "zero alerts in DB" from "alerts exist but condition not met" from "Resend key missing" from "Yahoo API threw". A temporary `/api/debug/alerts` endpoint was also added to inspect DB state and env vars directly — must be removed after diagnosis.
+
+### Why cache-first pricing in alert checker (v1.5.6)
+
+**Decision:** `/api/cron/check-alerts` now reads prices from `snapshot_cache` first, falling back to `yahooFundamentals()` only when the cache is missing or stale (>25 hours). If both sources fail, the individual alert is skipped — the batch continues.
+
+**Why:** Vercel's serverless functions run on shared IP pools. Yahoo rate-limits (429) these IPs aggressively because many Vercel-hosted projects hit the same Yahoo endpoints. The snapshot cache is populated by GitHub Actions workflows (daily watchlist + weekly full universe), which run on GitHub's IP pool and already handle rate-limiting with jitter and exponential backoff. By reading from cache first, the alert checker makes zero Yahoo requests in the common case (cache is <25h old). The 25h staleness window (vs 24h snapshot interval) provides a 1h overlap buffer so a slightly delayed snapshot run doesn't invalidate the cache. The `priceSource` field in diagnostics makes it easy to verify in GitHub Actions logs whether prices came from cache or Yahoo fallback.
